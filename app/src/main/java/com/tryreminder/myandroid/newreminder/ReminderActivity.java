@@ -5,6 +5,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,5 +29,19 @@ public class ReminderActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_new:
+                //create new Reminder
+                Log.d(getLocalClassName(),"Create new Reminder");
+                return true;
+            case R.id.action_exit:
+                finish();
+                return true;
+            default:
+                return false;
+        }
+    }
 
 }
