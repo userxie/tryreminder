@@ -29,22 +29,23 @@ public class ReminderDbAdapter {
     private DatabaseHelper mDbHelper;
     private SQLiteDatabase mDb;
 
-    private static final String DATABASSE_NAME ="dba_remdrs";
+    private static final String DATABASSE_NAME ="dba_remdrs1";
     private static final String TABLE_NAME ="tbl_remdrs";
     private static final int DATABASE_VERSION =1;
     private final Context mCtx;
 
     private static final String DATABASE_CRETE =
-            "CREATE TABLE if not exists "+TABLE_NAME+"("+COL_ID
-            +"INTEGER PRIMARY KEY autoincrement, "+
-                    COL_CONTENT+"TEXT, "+
-                    COL_IMPORTANT+"INTEGER);";
+            "CREATE TABLE if not exists "+TABLE_NAME+" ( "+COL_ID
+            +" INTEGER PRIMARY KEY autoincrement, "+
+                    COL_CONTENT+" TEXT, "+
+                    COL_IMPORTANT+" INTEGER);";
 
     public ReminderDbAdapter(Context ctx){
         this.mCtx =ctx;
     }
     //open database
     public void open() throws SQLiteException{
+        Log.d(TAG, "open: there something wrong");
         mDbHelper=new DatabaseHelper(mCtx);
         mDb =mDbHelper.getWritableDatabase();
     }
@@ -102,6 +103,7 @@ public class ReminderDbAdapter {
 
     }
     public  void deleteAllReminders(){
+        Log.d(TAG, "deleteAllReminders: there");
         mDb.delete(TABLE_NAME,null,null);
     }
     private static class DatabaseHelper extends SQLiteOpenHelper{
@@ -112,6 +114,7 @@ public class ReminderDbAdapter {
         @Override
         public void onCreate(SQLiteDatabase db) {
             Log.w(TAG,DATABASE_CRETE);
+            db.execSQL(DATABASE_CRETE);
         }
 
         @Override

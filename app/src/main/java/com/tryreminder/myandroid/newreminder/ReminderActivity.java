@@ -23,20 +23,37 @@ public class ReminderActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminders);
         mListView =(ListView)findViewById(R.id.reminder_list_view);
+        mListView.setDivider(null);
         mDbAdapter =new ReminderDbAdapter(this);
         mDbAdapter.open();
+        if(savedInstanceState == null){
+            mDbAdapter.deleteAllReminders();
+            insertSomeReminders();
+        }
         Cursor cursor =mDbAdapter.fetchAllReminders();
         String [] from =new String[]{ReminderDbAdapter.COL_CONTENT};
         int [] to =new int[]{R.id.row_text};
-        mCursorAdapter =new ReminderSimpleCursorAdapter(this,R.layout.reminders_row,cursor,from,to,0);
+        mCursorAdapter =new ReminderSimpleCursorAdapter(ReminderActivity.this,R.layout.reminders_row,cursor,from,to,0);
         mListView.setAdapter(mCursorAdapter);
-//        ArrayAdapter<String> arrayAdapter =new ArrayAdapter<String>(
-//                this,
-//                R.layout.reminders_row,
-//                R.id.row_text,
-//                new String[]{"first record","second record","third record"});
-//        mListView.setAdapter(arrayAdapter);
 
+    }
+
+    private void insertSomeReminders() {
+        mDbAdapter.createReminder("Buy Learn Android Studio", true);
+        mDbAdapter.createReminder("Send Dad birthday gift", false);
+        mDbAdapter.createReminder("Dinner at the Gage on Friday", false);
+        mDbAdapter.createReminder("String squash racket", false);
+        mDbAdapter.createReminder("Shovel and salt walkways", false);
+        mDbAdapter.createReminder("Prepare Advanced Android syllabus", true);
+        mDbAdapter.createReminder("Buy new office chair", false);
+        mDbAdapter.createReminder("Call Auto-body shop for quote", false);
+        mDbAdapter.createReminder("Renew membership to club", false);
+        mDbAdapter.createReminder("Buy new Galaxy Android phone", true);
+        mDbAdapter.createReminder("Sell old Android phone - auction", false);
+        mDbAdapter.createReminder("Buy new paddles for kayaks", false);
+        mDbAdapter.createReminder("Call accountant about tax returns", false);
+        mDbAdapter.createReminder("Buy 300,000 shares of Google", false);
+        mDbAdapter.createReminder("Call the Dalai Lama back", true);
     }
 
     @Override
