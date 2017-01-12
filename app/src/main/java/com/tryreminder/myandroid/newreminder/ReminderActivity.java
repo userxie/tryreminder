@@ -1,41 +1,87 @@
 package com.tryreminder.myandroid.newreminder;
 
+import android.app.Dialog;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 public class ReminderActivity extends AppCompatActivity {
 
-    private  ListView mListView;
+    private ListView mListView;
     private ReminderDbAdapter mDbAdapter;
     private ReminderSimpleCursorAdapter mCursorAdapter;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient mClient;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminders);
-        mListView =(ListView)findViewById(R.id.reminder_list_view);
+        mListView = (ListView) findViewById(R.id.reminder_list_view);
         mListView.setDivider(null);
-        mDbAdapter =new ReminderDbAdapter(this);
+        mDbAdapter = new ReminderDbAdapter(this);
         mDbAdapter.open();
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             mDbAdapter.deleteAllReminders();
             insertSomeReminders();
         }
-        Cursor cursor =mDbAdapter.fetchAllReminders();
-        String [] from =new String[]{ReminderDbAdapter.COL_CONTENT};
-        int [] to =new int[]{R.id.row_text};
-        mCursorAdapter =new ReminderSimpleCursorAdapter(ReminderActivity.this,R.layout.reminders_row,cursor,from,to,0);
+        Cursor cursor = mDbAdapter.fetchAllReminders();
+        String[] from = new String[]{ReminderDbAdapter.COL_CONTENT};
+        int[] to = new int[]{R.id.row_text};
+        mCursorAdapter = new ReminderSimpleCursorAdapter(ReminderActivity.this, R.layout.reminders_row, cursor, from, to, 0);
         mListView.setAdapter(mCursorAdapter);
 
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, final int masterListPosition, long id) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ReminderActivity.this);
+                ListView modeListView = new ListView(ReminderActivity.this);
+                String[] modes = new String[]{"编辑", "删除"};
+                ArrayAdapter<String> modeAdapter = new ArrayAdapter<String>(ReminderActivity.this,
+                        android.R.layout.simple_list_item_2, android.R.id.text1, modes);
+                modeListView.setAdapter(modeAdapter);
+                builder.setView(modeListView);
+                final Dialog dialog = builder.create();
+                dialog.show();
+                modeListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        if(position==0){
+                            Toast.makeText(ReminderActivity.this,"edit"+masterListPosition,Toast.LENGTH_LONG).show();
+
+                        }else {
+                            Toast.makeText(ReminderActivity.this,"delete"+masterListPosition,Toast.LENGTH_SHORT).show();
+                        }
+                        dialog.dismiss();
+                    }
+                });
+
+            }
+        });
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        mClient = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     private void insertSomeReminders() {
@@ -61,7 +107,7 @@ public class ReminderActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_new:
                 //create new Reminder
-                Log.d(getLocalClassName(),"Create new Reminder");
+                Log.d(getLocalClassName(), "Create new Reminder");
                 return true;
             case R.id.action_exit:
                 finish();
@@ -71,4 +117,43 @@ public class ReminderActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        mClient.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Reminder Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.tryreminder.myandroid.newreminder/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(mClient, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Reminder Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app URL is correct.
+                Uri.parse("android-app://com.tryreminder.myandroid.newreminder/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(mClient, viewAction);
+        mClient.disconnect();
+    }
 }
