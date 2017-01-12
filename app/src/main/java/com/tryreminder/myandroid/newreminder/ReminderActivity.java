@@ -1,5 +1,6 @@
 package com.tryreminder.myandroid.newreminder;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -15,17 +16,26 @@ import android.widget.ListView;
 public class ReminderActivity extends AppCompatActivity {
 
     private  ListView mListView;
+    private ReminderDbAdapter mDbAdapter;
+    private ReminderSimpleCursorAdapter mCursorAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminders);
         mListView =(ListView)findViewById(R.id.reminder_list_view);
-        ArrayAdapter<String> arrayAdapter =new ArrayAdapter<String>(
-                this,
-                R.layout.reminders_row,
-                R.id.row_text,
-                new String[]{"first record","second record","third record"});
-        mListView.setAdapter(arrayAdapter);
+        mDbAdapter =new ReminderDbAdapter(this);
+        mDbAdapter.open();
+        Cursor cursor =mDbAdapter.fetchAllReminders();
+        String [] from =new String[]{ReminderDbAdapter.COL_CONTENT};
+        int [] to =new int[]{R.id.row_text};
+        mCursorAdapter =new ReminderSimpleCursorAdapter(this,R.layout.reminders_row,cursor,from,to,0);
+        mListView.setAdapter(mCursorAdapter);
+//        ArrayAdapter<String> arrayAdapter =new ArrayAdapter<String>(
+//                this,
+//                R.layout.reminders_row,
+//                R.id.row_text,
+//                new String[]{"first record","second record","third record"});
+//        mListView.setAdapter(arrayAdapter);
 
     }
 
