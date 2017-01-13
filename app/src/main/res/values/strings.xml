@@ -4,4 +4,6 @@
     <string name="new_reminder">new Reminder</string>
     <string name="exit">exit</string>
     <string name="reminder_text">Reminder Text</string>
+    <string name="NewReminder">New Reminder:</string>
+    <string name="important">Important</string>
 </resources>
