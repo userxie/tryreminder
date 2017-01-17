@@ -40,6 +40,7 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -88,7 +89,7 @@ public class ReminderActivity extends AppCompatActivity {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(ReminderActivity.this);
                 ListView modeListView = new ListView(ReminderActivity.this);
-                String[] modes = new String[]{"编辑", "删除"};
+                String[] modes = new String[]{"编辑", "删除","记录时间"};
                 ArrayAdapter<String> modeAdapter = new ArrayAdapter<String>(ReminderActivity.this,
                         android.R.layout.simple_list_item_1, android.R.id.text1, modes);
                 modeListView.setAdapter(modeAdapter);
@@ -112,18 +113,24 @@ public class ReminderActivity extends AppCompatActivity {
                             //Toast.makeText(ReminderActivity.this,"delete"+masterListPosition,
                             // Toast.LENGTH_SHORT).show();
                         }else{
-                            final Date today =new Date();
+
                             TimePickerDialog.OnTimeSetListener listener =new
                                     TimePickerDialog.OnTimeSetListener(){
 
                                         @Override
                                         public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                                            Date alarm =new Date(today.getYear(),today.getMonth(),today.getDate(),hour,minute);
-                                            scheduleReminder(alarm.getTime(),reminder.getContent());
+//                                            Date alarm =new Date(today.getYear(),today.getMonth(),today.getDate(),hour,minute);
+//                                            scheduleReminder(alarm.getTime(),reminder.getContent());
+                                            final Calendar alarmTime =Calendar.getInstance();
+                                            alarmTime.set(Calendar.HOUR,hour);
+                                            alarmTime.set(Calendar.MINUTE,minute);
+                                            scheduleReminder(alarmTime.getTimeInMillis(),reminder.getContent());
                                         }
                                     };
-                            new TimePickerDialog(ReminderActivity.this,null,
-                                    today.getHours(),today.getMinutes(),false).show();
+//                            new TimePickerDialog(ReminderActivity.this,null,
+//                                    today.getHours(),today.getMinutes(),false).show();
+                            final Calendar tooday =Calendar.getInstance();
+                            new TimePickerDialog(ReminderActivity.this,null,tooday.get(Calendar.HOUR),tooday.get(Calendar.MINUTE),false).show();
                         }
                         dialog.dismiss();
                     }
