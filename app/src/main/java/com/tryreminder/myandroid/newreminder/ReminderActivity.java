@@ -193,6 +193,7 @@ public class ReminderActivity extends AppCompatActivity {
         final EditText editText = (EditText) dialog.findViewById(R.id.custom_edit_reminder);
         Button commitButton= (Button) dialog.findViewById(R.id.custom_button_commit);
         final CheckBox checkBox = (CheckBox) dialog.findViewById(R.id.custom_check_box);
+        checkBox.setChecked(true);//important Reminders
         LinearLayout rootLayout = (LinearLayout) dialog.findViewById(R.id.custom_root_layout);
         final boolean isEditOperation =(reminder !=null);
         if(isEditOperation){
