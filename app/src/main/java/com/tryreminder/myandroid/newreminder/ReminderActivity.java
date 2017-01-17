@@ -2,6 +2,7 @@ package com.tryreminder.myandroid.newreminder;
 
 import android.annotation.TargetApi;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -34,6 +35,7 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+import java.util.Date;
 import java.util.List;
 
 import static com.tryreminder.myandroid.newreminder.R.color.blue;
@@ -54,10 +56,12 @@ public class ReminderActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminders);
-        ActionBar actionBar =getSupportActionBar();
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setIcon(R.mipmap.ic_nlauncher);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setIcon(R.drawable.ic_action_name);
+        }
         mListView = (ListView) findViewById(R.id.reminder_list_view);
         mListView.setDivider(null);
         mDbAdapter = new ReminderDbAdapter(this);
@@ -69,7 +73,8 @@ public class ReminderActivity extends AppCompatActivity {
         Cursor cursor = mDbAdapter.fetchAllReminders();
         String[] from = new String[]{ReminderDbAdapter.COL_CONTENT};
         int[] to = new int[]{R.id.row_text};
-        mCursorAdapter = new ReminderSimpleCursorAdapter(ReminderActivity.this, R.layout.reminders_row, cursor, from, to, 0);
+        mCursorAdapter = new ReminderSimpleCursorAdapter(ReminderActivity.this,
+                R.layout.reminders_row, cursor, from, to, 0);
         mListView.setAdapter(mCursorAdapter);
 
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -80,7 +85,7 @@ public class ReminderActivity extends AppCompatActivity {
                 ListView modeListView = new ListView(ReminderActivity.this);
                 String[] modes = new String[]{"编辑", "删除"};
                 ArrayAdapter<String> modeAdapter = new ArrayAdapter<String>(ReminderActivity.this,
-                        android.R.layout.simple_list_item_2, android.R.id.text1, modes);
+                        android.R.layout.simple_list_item_1, android.R.id.text1, modes);
                 modeListView.setAdapter(modeAdapter);
                 builder.setView(modeListView);
                 final Dialog dialog = builder.create();
@@ -89,15 +94,22 @@ public class ReminderActivity extends AppCompatActivity {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         if(position==0){
+                            Log.d("choice","choice edit");
                             int nId =getIdFromPosition(masterListPosition);
+
                             Reminder reminder =mDbAdapter.fetchReminderById(nId);
                             fireCustomDialog(reminder);
-                            //Toast.makeText(ReminderActivity.this,"edit"+masterListPosition,Toast.LENGTH_LONG).show();
-
-                        }else {
+                            //Toast.makeText(ReminderActivity.this,"edit"+masterListPosition,
+                            // Toast.LENGTH_LONG).show();
+                        }else if(position==1){
                             mDbAdapter.deleteReminderById(getIdFromPosition(masterListPosition));
                             mCursorAdapter.changeCursor(mDbAdapter.fetchAllReminders());
-                            //Toast.makeText(ReminderActivity.this,"delete"+masterListPosition,Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(ReminderActivity.this,"delete"+masterListPosition,
+                            // Toast.LENGTH_SHORT).show();
+                        }else{
+                            Date today =new Date();
+                            new TimePickerDialog(ReminderActivity.this,null,
+                                    today.getHours(),today.getMinutes(),false).show();
                         }
                         dialog.dismiss();
                     }
@@ -114,7 +126,8 @@ public class ReminderActivity extends AppCompatActivity {
             mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
             mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
                 @Override
-                public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                                                      boolean checked) {
 
                 }
 
@@ -143,13 +156,17 @@ public class ReminderActivity extends AppCompatActivity {
                             actionMode.finish();
                             mCursorAdapter.changeCursor(mDbAdapter.fetchAllReminders());
                             return true;
+                        case R.id.menu_item_add_reminder:
+                            fireCustomDialog(null);
+                            actionMode.finish();
+                            mCursorAdapter.changeCursor(mDbAdapter.fetchAllReminders());
+                            return true;
                     }
                     return false;
                 }
 
                 @Override
                 public void onDestroyActionMode(ActionMode actionMode) {
-
                 }
             });
         }
@@ -199,14 +216,15 @@ public class ReminderActivity extends AppCompatActivity {
             titleview.setText("Edit Reminder");
             checkBox.setChecked(reminder.getImportant()==1);
             editText.setText(reminder.getContent());
-            rootLayout.setBackgroundColor(getResources().getColor(R.color.blue,null));
+            rootLayout.setBackgroundColor(getResources().getColor(R.color.blue));
         }
         commitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String reminderText =editText.getText().toString();
                 if(isEditOperation){
-                    Reminder reminderEdited =new Reminder(reminder.getId(),reminderText,checkBox.isChecked()?1:0);
+                    Reminder reminderEdited =new Reminder(reminder.getId(),reminderText,
+                            checkBox.isChecked()?1:0);
                     mDbAdapter.updateReminder(reminderEdited);
                 }else{
                     mDbAdapter.createReminder(reminderText,checkBox.isChecked());
