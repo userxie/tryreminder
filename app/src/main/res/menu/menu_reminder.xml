@@ -11,4 +11,9 @@
           android:title="@string/exit"
           android:orderInCategory="200"
           app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about"
+        android:title="About"
+        android:orderInCategory="200"
+        app:showAsAction="never"/>
 </menu>
