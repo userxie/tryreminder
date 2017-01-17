@@ -88,7 +88,7 @@ public class ReminderActivity extends AppCompatActivity {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(ReminderActivity.this);
                 ListView modeListView = new ListView(ReminderActivity.this);
-                String[] modes = new String[]{"编辑", "删除"};
+                String[] modes = new String[]{"编辑", "删除","时间"};
                 ArrayAdapter<String> modeAdapter = new ArrayAdapter<String>(ReminderActivity.this,
                         android.R.layout.simple_list_item_1, android.R.id.text1, modes);
                 modeListView.setAdapter(modeAdapter);
@@ -142,7 +142,6 @@ public class ReminderActivity extends AppCompatActivity {
                 @Override
                 public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
                                                       boolean checked) {
-
                 }
 
                 @Override
